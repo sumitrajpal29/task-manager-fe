@@ -1,25 +1,58 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import TaskTable from "./components/TaskTable";
+import AddTaskModal from "./components/AddTaskModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import io from "socket.io-client";
 
-function App() {
+const socket = io("http://localhost:5000"); // Replace with your backend URL
+
+const App = () => {
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    toast.success("Welcome to Task Management Dashboard!");
+    fetchTasks();
+
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.on('taskAdded', (task) => {
+      console.log('Task added:', task);
+    });
+
+    // socket.on("taskUpdated", (updatedTask) => {
+    //   setTasks((prevTasks) =>
+    //     prevTasks.map((task) =>
+    //       task.id === updatedTask.id ? updatedTask : task
+    //     )
+    //   );
+    //   toast.info("Task updated!");
+    // });
+
+    // socket.on("taskDeleted", (taskId) => {
+    //   setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+    //   toast.error("Task deleted!");
+    // });
+
+    return () => socket.disconnect();
+  }, []);
+
+  const fetchTasks = async () => {
+    const response = await fetch("http://localhost:5000/tasks");
+    const data = await response.json();
+    setTasks(data);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container mx-auto mt-4">
+      <h1 className="text-2xl font-bold mb-4">Task Management Dashboard</h1>
+      <TaskTable tasks={tasks} />
+      <AddTaskModal fetch={fetchTasks} />
+      <ToastContainer />
     </div>
   );
-}
+};
 
 export default App;
