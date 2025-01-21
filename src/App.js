@@ -5,21 +5,21 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // Replace with your backend URL
-
 const App = () => {
   const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
+    const socket = io("http://localhost:5000"); // Replace with your backend URL
     toast.success("Welcome to Task Management Dashboard!");
     fetchTasks();
 
-    socket.on('connect', () => {
-      console.log('Connected to server');
+    socket.on("connect", () => {
+      console.log("Connected to server");
     });
 
-    socket.on('taskAdded', (task) => {
-      console.log('Task added:', task);
+    socket.on("taskAdded", (task) => {
+      debugger;
+      console.log("Task added:", task);
     });
 
     // socket.on("taskUpdated", (updatedTask) => {
